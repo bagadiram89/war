@@ -1,0 +1,17 @@
+node{
+    stage('cloning updated code from github'){
+        git credentialsId: '7e187859-15c5-4945-b391-c522f1995f79', url: 'https://github.com/bagadiram89/amazon.git'
+    }
+    stage('building updateed code with maven'){
+        sh 'mvn install'
+    }
+    stage('create image from update code'){
+    sh 'docker build -t bsrdevops/newproject:v1 .'
+    }
+    stage('push images to dockerhub'){
+        withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerpasswd')]){
+            sh "docker login -u bsrdevops -p ${dockerpasswd}"
+        }
+        sh 'docker push bsrdevops/newproject:v1'
+    }
+}
